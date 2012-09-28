@@ -104,7 +104,6 @@ public class Times {
 	public void updateRanks() {
 		Query<DB> data = this.plugin.database.getDatabase().find(DB.class).where().gt("id", 0).order().asc("Time");
 		int timeCount = data.findRowCount();
-		this.plugin.log.log(Level.INFO, "timeCount " + timeCount);
 		if (data != null && timeCount > 0) {
 			List<DB> timeList = data.findList();
 			int i = 1;
