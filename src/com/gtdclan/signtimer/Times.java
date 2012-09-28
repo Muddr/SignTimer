@@ -14,13 +14,14 @@ public class Times {
 	}
 	
 	public void addTime(String playerName, int time) {
-		String message;
+		String message, bmessage;
 		DB data = this.plugin.database.getDatabase().find(DB.class).where().ieq("Playername", playerName).findUnique();
 		if (data == null) {
 			data = new DB();
 			data.setPlayername(playerName);
 			data.setTime(time);
 			message = "Your time has been saved.";
+			bmessage = "It was their first time.";
 			this.plugin.database.getDatabase().save(data);
 		}
 		else {
@@ -28,21 +29,30 @@ public class Times {
 			
 			if (time < savedTime) {
 				message = "New personal best. " + this.plugin.Util.getFriendly(Integer.valueOf(time));
+				bmessage = "with a new personal best of " + this.plugin.Util.getFriendly(Integer.valueOf(time));
 				data.setTime(time);
 				this.plugin.database.getDatabase().save(data);
 			}
 			else if (time == savedTime) {
 				message = "You matched your best time of " + this.plugin.Util.getFriendly(Integer.valueOf(time));
+				bmessage = "They matched their best time of " + this.plugin.Util.getFriendly(Integer.valueOf(time));
 			}
 			else {
 				Integer difference = (int) (time - savedTime);
 				String fasterTime = this.plugin.Util.getFriendly(difference);
 				message = "Your old time was " + fasterTime + " faster.";
+				bmessage = "which was " + fasterTime + " slower.";
 			}
+		}
+		if (this.plugin.broadcast_times) {
+			this.plugin.Util.broadcast(bmessage);
+		}
+		else {
+			this.plugin.Util.messagePlayer(playerName, message);
 		}
 		
 		this.updateRanks();
-		this.plugin.Util.messagePlayer(playerName, message);
+		
 	}
 	
 	public void getTime(String playerName) {
