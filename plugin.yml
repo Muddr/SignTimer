@@ -1,0 +1,10 @@
+name: SignTimer
+version: 1.0.1
+description: A countdown timer using signs.
+authors: [Muddr]
+main: com.gtdclan.signtimer.Main
+
+commands:
+  st:
+    description: Main command for SignTimer.
+    usage: Error! Type /<command> for help.

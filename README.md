@@ -5,7 +5,7 @@ A bukkit plugin that makes a timer out of signs.
 ## Quick Info
 - Current Version: 1.0.0
 - CB Version: CB 1.3.2-R0.2
-- Changelog: <https://github.com/Muddr/SignTimer/blob/master/changelog.md>
+- Changelog: <https://github.com/Muddr/SignTimer/blob/master/CHANGELOG.md>
 - Mirror Download: <https://github.com/downloads/Muddr/SignTimer/signtimer.jar>
 
 ## Features
@@ -14,6 +14,13 @@ A bukkit plugin that makes a timer out of signs.
 - Top 10 list for fastest times
 - See your own personal best time
 - See other player's best time
+
+## Todo List
+
+- clean up the columns for the /st top10 command.
+- Look into announcing times to the player when timer is on.
+- add permissions to be able to remove signs instead of having to be Op.
+- add option to display 00d:00h:00m:00s:00ms time format.
 
 ### Default config.yml:
 	settings:
