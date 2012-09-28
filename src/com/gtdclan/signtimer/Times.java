@@ -1,6 +1,5 @@
 package com.gtdclan.signtimer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -47,11 +46,10 @@ public class Times {
 	}
 	
 	public void getTime(String playerName) {
-		HashMap<String, String> rankList = this.plugin.rankList;
 		String message;
-		String playerInfo = rankList.get(playerName);
+		String playerInfo = this.plugin.rankList.get(playerName);
 		if (playerInfo != null) {
-			String[] pInfo = rankList.get(playerName).split(",");
+			String[] pInfo = this.plugin.rankList.get(playerName).split(",");
 			String playerTime = this.plugin.Util.getFriendly(Integer.valueOf(pInfo[1]));
 			
 			message = " " + String.format("At rank # %02d", Integer.valueOf(pInfo[0])) + ", your best time is " + playerTime;
@@ -61,7 +59,6 @@ public class Times {
 		}
 		
 		this.plugin.Util.messagePlayer(playerName, message);
-		rankList.clear();
 	}
 	
 	public void rankList(String senderName) {
@@ -69,15 +66,14 @@ public class Times {
 	}
 	
 	public void rankList(String senderName, String rankPlayer, Boolean top) {
-		HashMap<String, String> rankList = this.plugin.rankList;
-		if (rankList.size() > 0) {
+		if (this.plugin.rankList.size() > 0) {
 			if (top) {
 				
 				this.plugin.Util.messagePlayer(senderName, "^gold^underline  Rank  |  Name  |  Time");
 				
 				int i = 0;
-				for (String playerName : rankList.keySet()) {
-					String[] playerInfo = rankList.get(playerName).split(",");
+				for (String playerName : this.plugin.rankList.keySet()) {
+					String[] playerInfo = this.plugin.rankList.get(playerName).split(",");
 					String playerTime = this.plugin.Util.getFriendly(Integer.valueOf(playerInfo[1]));
 					
 					this.plugin.Util.messagePlayer(senderName, "  " + String.format("%02d", Integer.valueOf(playerInfo[0])) + "  |  " + playerName + "  |  " + playerTime);
@@ -88,9 +84,9 @@ public class Times {
 				}
 			}
 			else {
-				String playerInfo = rankList.get(rankPlayer);
+				String playerInfo = this.plugin.rankList.get(rankPlayer);
 				if (playerInfo != null) {
-					String[] pInfo = rankList.get(rankPlayer).split(",");
+					String[] pInfo = this.plugin.rankList.get(rankPlayer).split(",");
 					String playerTime = this.plugin.Util.getFriendly(Integer.valueOf(pInfo[1]));
 					
 					this.plugin.Util.messagePlayer(senderName, " " + String.format(rankPlayer + " is rank # %02d", Integer.valueOf(pInfo[0])) + ", with a time of " + playerTime);
@@ -103,12 +99,12 @@ public class Times {
 		else {
 			this.plugin.Util.messagePlayer(senderName, "Error: could not find any times.");
 		}
-		rankList.clear();
 	}
 	
 	public void updateRanks() {
 		Query<DB> data = this.plugin.database.getDatabase().find(DB.class).where().gt("id", 0).order().asc("Time");
 		int timeCount = data.findRowCount();
+		this.plugin.log.log(Level.INFO, "timeCount " + timeCount);
 		if (data != null && timeCount > 0) {
 			List<DB> timeList = data.findList();
 			int i = 1;
@@ -121,7 +117,7 @@ public class Times {
 			}
 		}
 		else {
-			this.plugin.log.log(Level.INFO, "Error: could not find any times.");
+			this.plugin.log.log(Level.INFO, "Error: could not find any times in DB.");
 		}
 	}
 }
