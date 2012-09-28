@@ -1,6 +1,6 @@
 # SignTimer
 
-A bukkit plugin that makes a timer out of signs.
+A stopwatch plugin using signs to start/stop the clock. Great for timed competitions (mazes, speed runs, etc).
 
 ## Quick Info
 - Current Version: 1.0.0
