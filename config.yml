@@ -1,6 +1,9 @@
 # Visit http://dev.bukkit.org/server-mods/signtimer/ for more info.
 settings:
   broadcast_times: false
+  include_days: false
+  include_milli: true
+  compact_time: true
 
 messages:
   broadcast_message: "%PLAYERNAME% finished in %TIME%"

@@ -28,19 +28,67 @@ public class Util {
 		}
 	}
 	
-	public String getFriendly(Integer ms) {
+	public String formatTime(Integer ms) {
+		if (this.plugin.compact_time) {
+			return this.getCompact(ms);
+		}
+		else {
+			return this.getFriendly(ms);
+		}
+	}
+	
+	public String getCompact(Integer time) {
 		String output = "";
-		if (ms > 0) {
-			Integer second, minute, hour, day;
-			if (ms < 1000) {
-				return ms + " ms";
-			}
-			ms = ms / 1000;
+		if (time > 0) {
+			Integer second, minute, hour, day, ms;
 			
-			day = (int) Math.floor((ms % 31536000) / 86400);
-			hour = (int) Math.floor(((ms % 31536000) % 86400) / 3600);
-			minute = (int) Math.floor((((ms % 31536000) % 86400) % 3600) / 60);
-			second = ((ms % 31536000) % 86400) % 3600 % 60;
+			ms = time % 1000;
+			time = time / 1000;
+			hour = (int) Math.floor((time % 31536000) / 3600);
+			minute = (int) Math.floor((((time % 31536000) % 86400) % 3600) / 60);
+			second = (int) Math.floor(((time % 31536000) % 86400) % 3600 % 60);
+			
+			if (this.plugin.include_days) {
+				day = (int) Math.floor((time % 31536000) / 86400);
+				hour = (int) Math.floor(((time % 31536000) % 86400) / 3600);
+				output = String.format("%02d", day) + "d^gold:^white";
+			}
+			
+			String s_hour = String.format("%02d", hour) + "h^gold:^white";
+			String s_minute = String.format("%02d", minute) + "m^gold:^white";
+			String s_second = String.format("%02d", second) + "s";
+			String s_ms = "^gold:^white" + String.format("%04d", ms) + "ms";
+			
+			output += s_hour + s_minute + s_second;
+			if (this.plugin.include_milli) {
+				output += s_ms;
+			}
+		}
+		else {
+			output = "Error: No Time.";
+		}
+		return output;
+	}
+	
+	public String getFriendly(Integer time) {
+		String output = "";
+		if (time > 0) {
+			Integer second, minute, hour, day;
+			if (time < 1000) {
+				return time + " ms";
+			}
+			
+			day = 0;
+			
+			time = time / 1000;
+			hour = (int) Math.floor((time % 31536000) / 3600);
+			minute = (int) Math.floor((((time % 31536000) % 86400) % 3600) / 60);
+			second = (int) Math.floor(((time % 31536000) % 86400) % 3600 % 60);
+			
+			if (this.plugin.include_days) {
+				day = (int) Math.floor((time % 31536000) / 86400);
+				hour = (int) Math.floor(((time % 31536000) % 86400) / 3600);
+			}
 			if (day > 0) {
 				if (day == 1) {
 					output += day + " day ";

@@ -32,15 +32,17 @@ public class Commands implements CommandExecutor {
 					
 					String[] messages = new String[] {
 					    "^redCommands:",
-					    "  ^gray/st mytime^white : Displays your best time.",
-					    "  ^gray/st rank <name>^white : Displays the rank for this player.",
-					    "  ^gray/st top10^white : Displays the top 10 quickest times."
+					    "  ^yellow/st mytime^white : Displays your best time.",
+					    "  ^yellow/st rank <name>^white : Displays the rank for this player.",
+					    "  ^yellow/st top10^white : Displays the top 10 quickest times.",
+					    "  ^yellow/st clear^white : Will Delete all saved times."
 					};
 					this.plugin.Util.messagePlayer(senderName, messages);
 					return true;
 				}
 				if (args[0].equalsIgnoreCase("mytime")) {
 					this.plugin.Times.getTime(senderName);
+					return true;
 				}
 				if (args[0].equalsIgnoreCase("rank")) {
 					if (args.length == 1) {
@@ -50,15 +52,27 @@ public class Commands implements CommandExecutor {
 						String rankPlayer = args[1];
 						this.plugin.Times.rankList(senderName, rankPlayer, false);
 					}
+					return true;
 				}
 				if (args[0].equalsIgnoreCase("top10")) {
 					this.plugin.Times.rankList(senderName);
+					return true;
+				}
+				if (args[0].equalsIgnoreCase("clear")) {
+					if (player.hasPermission("signtimer.cleartimes")) {
+						this.plugin.Times.clearTimes();
+					}
+					else {
+						this.plugin.Util.messagePlayer(senderName, "^redYou do not have permisison to clear times.");
+					}
+					return true;
 				}
 			}
 			else {
 				this.plugin.log.log(Level.INFO, "Commands must be done in game.");
+				return true;
 			}
-			return true;
+			
 		}
 		return false;
 	}

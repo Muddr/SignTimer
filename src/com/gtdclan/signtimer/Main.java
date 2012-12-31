@@ -1,5 +1,6 @@
 package com.gtdclan.signtimer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 	
 	private final Listeners Listener = new Listeners(this);
-	public Boolean broadcast_times;
+	public Boolean broadcast_times, include_days, include_milli, compact_time;
 	public Commands Commands = new Commands(this);
 	public Configuration Config = new Configuration(this);
 	public HashMap<String, String> rankList = new LinkedHashMap<String, String>();
@@ -63,12 +64,21 @@ public class Main extends JavaPlugin {
 		
 		this.Config.LoadConfig();
 		this.broadcast_times = this.getConfig().getBoolean("settings.broadcast_times", false);
+		this.include_days = this.getConfig().getBoolean("settings.include_days", false);
+		this.include_milli = this.getConfig().getBoolean("settings.include_milli", true);
+		this.compact_time = this.getConfig().getBoolean("settings.list_type", true);
 		this.broadcast_message = this.getConfig().getString("messages.broadcast_message", "%PLAYERNAME% finished in %TIME%");
 		this.player_message = this.getConfig().getString("messages.player_message", "Your time was %TIME%");
 		
 		this.initializeDatabase();
 		this.Times.updateRanks();
-		
+		try {
+			Metrics metrics = new Metrics(this);
+			metrics.start();
+		}
+		catch (IOException e) {
+			// Failed to submit the stats :-(
+		}
 		this.log.log(Level.INFO, this.getDescription().getName() + " has been enabled.");
 	}
 }

@@ -11,11 +11,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-/**
- * The Class Listeners.
- */
 public class Listeners implements Listener {
 	
 	private final Main plugin;
@@ -41,11 +40,21 @@ public class Listeners implements Listener {
 			Sign sign = (Sign) blockState;
 			String line0 = sign.getLine(0);
 			
-			if (line0.equalsIgnoreCase("[signtimer]") && !player.isOp()) {
+			if (line0.equalsIgnoreCase("[signtimer]") && !player.hasPermission("signtimer.removesigns")) {
 				sign.update();
 				this.plugin.Util.messagePlayer(playerName, "^redYou don't have permission to remove a sign timer");
 				event.setCancelled(true);
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onSignChange(SignChangeEvent event) {
+		Player player = event.getPlayer();
+		String line0 = event.getLine(0);
+		if (line0.equalsIgnoreCase("[signtimer]") && !player.hasPermission("signtimer.createsigns")) {
+			player.sendMessage(this.plugin.Util.parseColors("^redYou do not have permission to create a sign timer."));
+			event.setCancelled(true);
 		}
 	}
 	
@@ -84,7 +93,7 @@ public class Listeners implements Listener {
 					}
 					else {
 						int elapseTime = (int) (timeNow - startTime);
-						String time = this.plugin.Util.getFriendly(elapseTime);
+						String time = this.plugin.Util.formatTime(elapseTime);
 						
 						if (this.plugin.broadcast_times) {
 							message = this.plugin.broadcast_message.replace("%PLAYERNAME%", playerName);
@@ -102,6 +111,14 @@ public class Listeners implements Listener {
 					
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void PlayerQuitEvent(PlayerQuitEvent event) {
+		String playerName = event.getPlayer().getName();
+		if (this.times.containsKey(playerName)) {
+			this.times.remove(playerName);
 		}
 	}
 }
