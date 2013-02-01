@@ -1,16 +1,23 @@
-package com.gtdclan.signtimer;
+package com.gtdclan.signtimer.utilities;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.Calendar;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class Util {
+import com.gtdclan.signtimer.Main;
+
+public class Util_Misc {
 	
 	private final Main plugin;
 	
-	public Util(Main instance) {
+	public Util_Misc(Main instance) {
 		this.plugin = instance;
 	}
 	
@@ -25,6 +32,29 @@ public class Util {
 	public void console(String[] messages, Level level) {
 		for (String Message : messages) {
 			this.console(Message, level);
+		}
+	}
+	
+	public void copyFile(File sourceFile, File destFile) throws IOException {
+		if (!destFile.exists()) {
+			destFile.createNewFile();
+		}
+		
+		FileChannel source = null;
+		FileChannel destination = null;
+		
+		try {
+			source = new FileInputStream(sourceFile).getChannel();
+			destination = new FileOutputStream(destFile).getChannel();
+			destination.transferFrom(source, 0, source.size());
+		}
+		finally {
+			if (source != null) {
+				source.close();
+			}
+			if (destination != null) {
+				destination.close();
+			}
 		}
 	}
 	
@@ -143,6 +173,54 @@ public class Util {
 			return "just now";
 		}
 		return timeStr + " ago";
+	}
+	
+	public void listCommands(Player player) {
+		player.sendMessage("");
+		player.sendMessage("");
+		player.sendMessage(this.parseColors("^red^underlineCommands:"));
+		player.sendMessage("");
+		
+		if (player.hasPermission("signtimer.cleartimes")) {
+			player.sendMessage(this.parseColors("  ^gray/st clear <timerName>^white : Clears all times for <timerName>."));
+		}
+		
+		if (player.hasPermission("signtimer.delete")) {
+			player.sendMessage(this.parseColors("  ^gray/st delete <timerName>^white : Deletes <timerName> and removes all times/signs."));
+		}
+		
+		if (player.hasPermission("signtimer.enabledisable")) {
+			player.sendMessage(this.parseColors("  ^gray/st enable <timerName>^white : Enables <timername>."));
+			player.sendMessage(this.parseColors("  ^gray/st disable <timerName>^white : Disables <timername>."));
+		}
+		
+		if (player.hasPermission("signtimer.list")) {
+			player.sendMessage(this.parseColors("  ^gray/st list^white : Lists all timers."));
+		}
+		
+		player.sendMessage(this.parseColors("  ^gray/st mytime <timerName>^white : Lists all your times. <timerName> is optional."));
+		player.sendMessage(this.parseColors("  ^gray/st rank <playerName> <timerName>^white : Displays the rank for <playerName> time for <timerName>."));
+		
+		if (player.hasPermission("signtimer.rename")) {
+			player.sendMessage(this.parseColors("  ^gray/st rename <oldName> <newName>^white : Renames timer from <oldName> to <newName>"));
+		}
+		
+		player.sendMessage(this.parseColors("  ^gray/st top <timerName>^white : Lists the top " + this.plugin.top_amount + " times for <timerName>"));
+		player.sendMessage("");
+		player.sendMessage(this.parseColors("^red^underlineNon Command Permissions:"));
+		player.sendMessage("");
+		if (player.hasPermission("signtimer.createsigns")) {
+			player.sendMessage(this.parseColors("  ^grayYou can create timer signs."));
+		}
+		else {
+			player.sendMessage(this.parseColors("  ^grayYou can not create timer signs."));
+		}
+		if (player.hasPermission("signtimer.removesigns")) {
+			player.sendMessage(this.parseColors("  ^grayYou can remove timer signs."));
+		}
+		else {
+			player.sendMessage(this.parseColors("  ^grayYou can not remove timer signs."));
+		}
 	}
 	
 	public void messagePlayer(String playerName, String message) {

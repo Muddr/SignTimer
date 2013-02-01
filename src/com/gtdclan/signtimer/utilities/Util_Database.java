@@ -1,4 +1,4 @@
-package com.gtdclan.signtimer;
+package com.gtdclan.signtimer.utilities;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -15,21 +15,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
+import com.gtdclan.signtimer.Main;
+import com.gtdclan.signtimer.databases.DB_Timers;
+import com.gtdclan.signtimer.databases.DB_Times;
 
-public abstract class UtilDatabase {
+public abstract class Util_Database {
 	
 	private ClassLoader classLoader;
 	private EbeanServer ebeanServer;
-	private final JavaPlugin javaPlugin;
+	private final Main plugin;
 	private Level loggerLevel;
 	private ServerConfig serverConfig;
 	private boolean usingSQLite;
+	
+	List<DB_Times> tempList = new ArrayList<DB_Times>();
 	
 	/**
 	 * Hooks into the plugin.
@@ -37,9 +44,9 @@ public abstract class UtilDatabase {
 	 * @param instance
 	 *        The plugin instance.
 	 */
-	public UtilDatabase(JavaPlugin javaPlugin) {
-		// Store the JavaPlugin
-		this.javaPlugin = javaPlugin;
+	public Util_Database(Main plugin) {
+		// Store the plugin
+		this.plugin = plugin;
 		
 		// Try to get the ClassLoader of the plugin using Reflection
 		try {
@@ -49,7 +56,7 @@ public abstract class UtilDatabase {
 			method.setAccessible(true);
 			
 			// Store the ClassLoader
-			this.classLoader = (ClassLoader) method.invoke(javaPlugin);
+			this.classLoader = (ClassLoader) method.invoke(plugin);
 		}
 		catch (Exception ex) {
 			throw new RuntimeException(
@@ -62,12 +69,43 @@ public abstract class UtilDatabase {
 	 * Method called after the loaded database has been created
 	 */
 	protected void afterCreateDatabase() {
+		if (this.plugin.upgrade) {
+			DB_Timers defaultTimer = new DB_Timers();
+			defaultTimer.setTimername("default");
+			defaultTimer.setId(1);
+			defaultTimer.setEnabled(false);
+			this.plugin.database.getDatabase().save(defaultTimer);
+			for (DB_Times time : this.tempList) {
+				DB_Times timeData = new DB_Times();
+				timeData.setPlayername(time.getPlayername());
+				timeData.setTime(time.getTime());
+				timeData.setTimerID(1);
+				this.plugin.database.getDatabase().save(timeData);
+			}
+			this.plugin.upgrade = false;
+		}
 	}
 	
 	/**
 	 * Method called before the loaded database is being dropped
 	 */
 	protected void beforeDropDatabase() {
+		if (this.plugin.upgrade) {
+			String sql = "select id, Playername, Time from signtimer_data where id > 0";
+			SqlQuery sqlQuery = this.ebeanServer.createSqlQuery(sql);
+			List<SqlRow> times = sqlQuery.findList();
+			int i = 0;
+			if (times.size() > 0) {
+				for (SqlRow time : times) {
+					DB_Times newTime = new DB_Times();
+					newTime.setPlayername(time.getString("Playername"));
+					newTime.setTime(time.getLong("Time"));
+					this.tempList.add(newTime);
+					i++;
+				}
+				this.plugin.util.console("DB UPGRADE - " + i + " times copied from DB", Level.INFO);
+			}
+		}
 	}
 	
 	private void disableDatabaseLogging(boolean logging) {
@@ -338,10 +376,10 @@ public abstract class UtilDatabase {
 	private String replaceDatabaseString(String input) {
 		input = input.replaceAll(
 		    "\\{DIR\\}",
-		    this.javaPlugin.getDataFolder().getPath().replaceAll("\\\\", "/") + "/");
+		    this.plugin.getDataFolder().getPath().replaceAll("\\\\", "/") + "/");
 		input = input.replaceAll(
 		    "\\{NAME\\}",
-		    this.javaPlugin.getDescription().getName().replaceAll("[^\\w_-]", ""));
+		    this.plugin.getDescription().getName().replaceAll("[^\\w_-]", ""));
 		
 		return input;
 	}

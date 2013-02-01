@@ -4,10 +4,15 @@ settings:
   include_days: false
   include_milli: true
   compact_time: true
+  top_amount: 10
+
+timer:
+  stop_on_death: true
+  stop_on_quit: true
 
 messages:
-  broadcast_message: "%PLAYERNAME% finished in %TIME%"
-  player_message: "Your time was %TIME%"
+  broadcast_message: "%PLAYERNAME% finished %TIMERNAME% in %TIME%"
+  player_message: "Your time for %TIMERNAME% was %TIME%"
 
 DB:
   driver: 'org.sqlite.JDBC'
@@ -17,3 +22,4 @@ DB:
   isolation: 'SERIALIZABLE'
   logging: false
   rebuild: false
+  version: 0

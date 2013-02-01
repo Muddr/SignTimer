@@ -1,5 +1,5 @@
 name: SignTimer
-version: 1.1.0
+version: 2.0.0
 description: A countdown timer using signs.
 authors: [Muddr]
 main: com.gtdclan.signtimer.Main
@@ -16,5 +16,17 @@ permissions:
     description: Allows player to create timer signs.
     default: op
   signtimer.cleartimes:
-    description: Allows player to clear all times.
+    description: Allows player to clear all times for a timer.
     default: op
+  signtimer.enabledisable:
+    description: Allows player to enable/disable timers.
+    default: op
+  signtimer.rename:
+    description: Allows player to rename timers.
+    default: op  
+  signtimer.delete:
+    description: Allows player to delete timers.
+    default: op  
+  signtimer.list:
+    description: Allows player to list timers.
+    default: op  

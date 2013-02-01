@@ -1,4 +1,4 @@
-package com.gtdclan.signtimer;
+package com.gtdclan.signtimer.databases;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -8,12 +8,14 @@ import com.avaje.ebean.validation.NotNull;
 
 @Entity()
 @Table(name = "signtimer_data")
-public class DB {
+public class DB_Times {
 	
 	@Id
 	private int id;
 	@NotNull
 	private String Playername;
+	@NotNull
+	private int TimerID;
 	@NotNull
 	private long Time;
 	
@@ -29,6 +31,10 @@ public class DB {
 		return this.Time;
 	}
 	
+	public int getTimerID() {
+		return this.TimerID;
+	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -39,5 +45,9 @@ public class DB {
 	
 	public void setTime(long Time) {
 		this.Time = Time;
+	}
+	
+	public void setTimerID(int timerID) {
+		this.TimerID = timerID;
 	}
 }
